@@ -1,0 +1,19 @@
+FROM node:20
+
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY package*.json ./
+
+RUN npm install
+
+# Environment argument with a default of development
+ARG API_URL=/api
+
+# Set environment variables
+ENV VITE_API_URL=${API_URL}
+
+EXPOSE 3000
+
+# Start development server with host and port specifications
+CMD ["npm", "run", "dev"]

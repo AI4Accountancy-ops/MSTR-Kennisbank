@@ -1,0 +1,6 @@
+name: ai4accountancy
+runtime:
+    name: python
+    options:
+        virtualenv: ../venv
+description: Azure AI Infrastructure for custom AI solutions

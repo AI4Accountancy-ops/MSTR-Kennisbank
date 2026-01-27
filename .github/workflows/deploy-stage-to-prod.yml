@@ -1,0 +1,38 @@
+name: Deploy Stage to Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensure full history is fetched
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Ensure stage branch exists
+        run: |
+          git fetch --all
+          if git show-ref --verify --quiet refs/remotes/origin/prod; then
+            echo "Branch prod exists, checking out..."
+            git checkout prod
+          else
+            echo "Branch prod does not exist, creating it..."
+            git checkout -b prod
+            git push origin prod
+          fi
+
+      - name: Deploy stage to prod
+        run: |
+          RELEASE_DATE=$(date '+%Y-%m-%d')
+          git merge origin/stage --no-ff -m "Release stage -> prod ${RELEASE_DATE}"
+          git push origin prod
